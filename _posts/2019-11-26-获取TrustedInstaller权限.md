@@ -48,6 +48,8 @@ TrustedInstaller其实是windows系统中的一个虚拟用户,当你需要对C�
 		{
 			return ;
 		}
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);  //不加会导致资源泄露
 		CloseHandle(hWrite);//关闭管道的输入端口
 	}
 
