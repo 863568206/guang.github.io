@@ -37,7 +37,7 @@ tags:
 			LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 			//LPNMITEMACTIVATE pNMItemActivate = LPNMITEMACTIVATE(pNMHDR);
 			//判断列表是否为空
-			if (m_listFeatures.GetItemCount() <= 0)
+			if (m_list.GetItemCount() <= 0)
 			{
 				break;
 			}
