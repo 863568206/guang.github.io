@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      （十九）word ptr 和 byte ptr--汇编笔记
+title:      （十九）word ptr 和 byte ptr --汇编笔记
 subtitle:   汇编语言
 date:       2020-03-30
 author:     YiMiTuMi
