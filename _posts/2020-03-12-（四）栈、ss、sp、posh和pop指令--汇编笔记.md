@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      （四）栈、ss、sp、posh和pop指令--汇编笔记
+title:      （四）栈、ss、sp、posh 和 pop 指令--汇编笔记
 subtitle:   汇编语言
 date:       2020-03-12
 author:     YiMiTuMi
