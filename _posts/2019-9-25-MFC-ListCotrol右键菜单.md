@@ -21,7 +21,7 @@ tags:
 
    xxx.h
 
-	afx_msg bool OnNMRClickListCotrol(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMRClickListCotrol(NMHDR *pNMHDR, LRESULT *pResult);
 
    xxx.cpp
 	
@@ -29,11 +29,9 @@ tags:
 	ON_NOTIFY(NM_RCLICK, IDR_MENU_xxx_菜单ID, &xxx::OnNMRClickListCotrol)
 
 	//弹出菜单设置
-	bool xxx::OnNMRClickListCotrol(NMHDR *pNMHDR, LRESULT *pResult)
+	void xxx::OnNMRClickListCotrol(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		// TODO: 在此添加控件通知处理程序代码
-		bool judge = TRUE;
-		
 		do 
 		{
 			LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -41,7 +39,6 @@ tags:
 			//判断列表是否为空
 			if (m_listFeatures.GetItemCount() <= 0)
 			{
-				judge = FALSE;
 				break;
 			}
 			//判断是否有列表选中
@@ -50,7 +47,6 @@ tags:
 				CMenu menu, *popup;
 				if (menu.LoadMenu(IDR_MENU_xxx_菜单ID) == NULL)
 				{
-					judge = FALSE;
 					break;
 				}
 
@@ -67,7 +63,7 @@ tags:
 	
 		} while (FALSE);
 
-		return judge;
+		return;
 	}
 
 ## 随便位置弹出
