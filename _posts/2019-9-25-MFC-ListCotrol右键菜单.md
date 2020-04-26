@@ -45,12 +45,13 @@ tags:
 			if (m_list.GetSelectedCount() > 0)
 			{
 				CMenu menu, *popup;
+				//添加的主菜单
 				if (menu.LoadMenu(IDR_MENU_xxx_菜单ID) == NULL)
 				{
 					break;
 				}
 
-				//获取句柄
+				//获取要显示菜单的句柄（0表示第一个）
 				popup = menu.GetSubMenu(0);
 
 				//位置信息
