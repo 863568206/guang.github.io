@@ -26,7 +26,7 @@ tags:
    xxx.cpp
 	
 	//在cpp前面添加消息
-	ON_NOTIFY(NM_RCLICK, IDR_MENU_xxx_菜单ID, &xxx::OnNMRClickListCotrol)
+	ON_NOTIFY(NM_RCLICK, IDR_List_xxx_列表ID, &xxx::OnNMRClickListCotrol)
 
 	//弹出菜单设置
 	void xxx::OnNMRClickListCotrol(NMHDR *pNMHDR, LRESULT *pResult)
