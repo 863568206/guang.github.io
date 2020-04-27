@@ -109,6 +109,13 @@ tags:
 		
 	void xxx::OnViewlog()
 	{
+		//获取选中行号
+		POSITION pos = m_list.GetFirstSelectedItemPosition();
+		LVITEM item;
+		ZeroMemory(&item, sizeof(item));
+		item.mask = LVIF_INDENT|LVIF_PARAM;
+		item.iItem = m_listFeatures.GetNextSelectedItem(pos);
+		
 		//处理该菜单对应的功能
 		xxx dlg;
 		dlg.DoModal();
