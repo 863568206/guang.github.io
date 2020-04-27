@@ -114,7 +114,7 @@ tags:
 		LVITEM item;
 		ZeroMemory(&item, sizeof(item));
 		item.mask = LVIF_INDENT|LVIF_PARAM;
-		item.iItem = m_listFeatures.GetNextSelectedItem(pos);
+		item.iItem = m_list.GetNextSelectedItem(pos);
 		
 		//处理该菜单对应的功能
 		xxx dlg;
