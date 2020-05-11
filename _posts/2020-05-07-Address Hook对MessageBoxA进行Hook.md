@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      Address Hook对MessageBoxA进行Hook
+title:      AddressHook -- IATHook
 subtitle:   c++
 date:       2020-05-07
 author:     YiMiTuMi
@@ -10,7 +10,7 @@ tags:
     - windows
 ---
 
-## Address Hook
+## IAT--Hook
 
 注释已经写的很清楚了，**InstallModuleIATHook**主要是对输入表进行修改。
 
