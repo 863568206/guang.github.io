@@ -54,9 +54,9 @@ tags:
 		{
 			//写入的jmp指令破坏了原来的前3条指令，因此在这里执行原函数的前3条指令
 			mov edi, edi
-				push ebp
-				mov ebp, esp
-				jmp g_jmpBackAddr  //跳回原函数被Hook指令之后的位置，绕过自己安装的Hook
+			push ebp
+			mov ebp, esp
+			jmp g_jmpBackAddr  //跳回原函数被Hook指令之后的位置，绕过自己安装的Hook
 		}
 	}
 	
