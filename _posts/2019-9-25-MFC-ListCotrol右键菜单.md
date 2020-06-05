@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      MFC-ListCotrol右键菜单
+title:      MFC-ListCotrol右键菜单与双击事件
 subtitle:   MFC
 date:       2019-07-26
 author:     YiMiTuMi
@@ -125,5 +125,29 @@ tags:
 	{
 		//处理菜单对应的用户界面显示状态
 	}
+
+## 双击事件
+
+双击List列表的某一个字段时可以产生一个事件进行一些变更操作。
+
+xxx.h
+
+	afx_msg void OnNMDblclkListNotAdjust(NMHDR *pNMHDR, LRESULT *pResult);
+	
+xxx.cpp
+
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_xxx, &xxx::OnNMDblclkListNotAdjust)
+	
+	//双击事件
+	void xxx::OnNMDblclkListNotAdjust(NMHDR *pNMHDR, LRESULT *pResult)
+	{
+		LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+		
+		int iSubItem = pNMItemActivate->iSubItem； //双击的列号
+		int iItem = pNMItemActivate->iItem；  //双击的行号
+		
+	}
+
+
 
 ## 蒲公英 -- 无法停留的爱
