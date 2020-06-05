@@ -142,6 +142,7 @@ xxx.cpp
 	void xxx::OnNMDblclkListNotAdjust(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+		*pResult = 0;
 		
 		int iSubItem = pNMItemActivate->iSubItem； //双击的列号
 		int iItem = pNMItemActivate->iItem；  //双击的行号
