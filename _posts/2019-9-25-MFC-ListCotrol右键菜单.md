@@ -242,7 +242,7 @@ xxx.cpp
 	int iPos = strFilePath.ReverseFind('.');
 	CString strIcon = strFilePath.Right(strFilePath.GetLength()-iPos-1);
 	int iImageIndex = OnAddIcon(strFilePath);//获取文件的ico
-	m_list.SetItem(nRow, 0, LVIF_IMAGE, strFileName, iImageIndex, NULL, NULL, NULL);
+	m_list.SetItem(nRow, 0, LVIF_TEXT | LVIF_IMAGE  | LVIF_STATE, strFileName, iImageIndex, NULL, NULL, NULL);
 
 
 ## 蒲公英 -- 无法停留的爱
