@@ -244,5 +244,52 @@ xxx.cpp
 	int iImageIndex = OnAddIcon(strFilePath);//获取文件的ico
 	m_list.SetItem(nRow, 0, LVIF_TEXT | LVIF_IMAGE  | LVIF_STATE, strFileName, iImageIndex, NULL, NULL, NULL);
 
+# 获取磁盘、桌面、我的文档等图标添加（Xp 无效）
+
+	//获取计算机图标
+	SHFILEINFO sfi_root;
+	LPITEMIDLIST pidl = NULL;
+	SHGetSpecialFolderLocation(NULL, CSIDL_DRIVES, &pidl);
+	SHGetFileInfo((LPCTSTR) pidl, 0, &sfi_root, sizeof(sfi_root), SHGFI_DISPLAYNAME|SHGFI_ICON | SHGFI_PIDL);//如果只获取图标，可以去掉SHGFI_DISPLAYNAME
+	
+	HICON computer = sfi_root.hIcon;
+	m_ImageList.Add(sfi_root.hIcon);
+
+	//获取驱动器图标
+	SHFILEINFO sfi_drive;
+	wchar_t driver_name[4] = L"C:\\";
+	::SHGetFileInfo(driver_name,0, &sfi_drive, sizeof(sfi_drive), SHGFI_DISPLAYNAME|SHGFI_ICON);
+	m_ImageList.Add(sfi_drive.hIcon);
+	
+	//桌面图标
+	wchar_t path_Desktop[512]={0};
+	SHGetSpecialFolderPath(0,path_Desktop,CSIDL_DESKTOPDIRECTORY,0); 
+	SHFILEINFO sfi_DeskTop;
+	::SHGetFileInfo(path_Desktop,0, &sfi_DeskTop, sizeof(sfi_DeskTop),SHGFI_ICON);
+	m_ImageList.Add(sfi_DeskTop.hIcon);
+	
+	//我的文档图标
+	wchar_t path_Document[512] = {0};
+	SHGetSpecialFolderPath(0,path_Document,CSIDL_MYDOCUMENTS,0); 
+	SHFILEINFO sfi_Document;
+	::SHGetFileInfo(path_Document,0, &sfi_Document, sizeof(sfi_Document),SHGFI_ICON);
+	m_ImageList.Add(sfi_Document.hIcon);
+	
+	HICON m_hIcon;
+	SetIcon(m_hIcon, TRUE);			// 设置大图标
+	SetIcon(m_hIcon, FALSE);		// 设置小图标
+
+	m_List.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
+
+	m_List.SetImageList(&m_ImageList, LVSIL_NORMAL);
+	m_List.SetImageList(&m_ImageList, LVSIL_SMALL);
+
+
+	m_List.InsertItem(0,_T("我的电脑"),0);
+	m_List.InsertItem(1,_T("C盘"),1);
+	m_List.InsertItem(2,_T("桌面"),2);
+	m_List.InsertItem(3,_T("我的文档"),3);
+
+
 
 ## 蒲公英 -- 无法停留的爱
