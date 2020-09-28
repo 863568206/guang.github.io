@@ -150,5 +150,53 @@ CTreeCtrl生成文件树状图。
 		*pResult = 0;
 	}
 
+## 获取我的电脑、我的文档、桌面等图标添加
+	
+构造函数：
+
+	//获取计算机图标
+	SHFILEINFO sfi_root;
+	LPITEMIDLIST pidl = NULL;
+	SHGetSpecialFolderLocation(NULL, CSIDL_DRIVES, &pidl);
+	SHGetFileInfo((LPCTSTR) pidl, 0, &sfi_root, sizeof(sfi_root), SHGFI_DISPLAYNAME|SHGFI_ICON | SHGFI_PIDL);//如果只获取图标，可以去掉				SHGFI_DISPLAYNAME
+	HICON hIcon  = sfi_root.hIcon;
+	ASSERT(hIcon);
+	m_ilTreeIcons.Add(sfi_root.hIcon); //0
+
+	SHFILEINFO sfi_drive;
+	//获取驱动器图标
+	wchar_t driver_name[4] = L"C:\\";
+	::SHGetFileInfo(driver_name,0, &sfi_drive, sizeof(sfi_drive), SHGFI_DISPLAYNAME|SHGFI_ICON);
+	m_ilTreeIcons.Add(sfi_drive.hIcon); //1
+		
+	//路径
+	hIcon = AfxGetApp()->LoadIcon(IDI_ICON_OPEN_FOLDER);//2
+	m_ilTreeIcons.Add (hIcon);
+		
+	//桌面
+	wchar_t path_Desktop[512]={0};
+	SHGetSpecialFolderPath(0,path_Desktop,CSIDL_DESKTOPDIRECTORY,0); 
+	SHFILEINFO sfi_DeskTop;
+	::SHGetFileInfo(path_Desktop,0, &sfi_DeskTop, sizeof(sfi_DeskTop),SHGFI_ICON);
+	m_ilTreeIcons.Add(sfi_DeskTop.hIcon);  //3
+		
+	//我的文档
+	wchar_t path_Document[512] = {0};
+	SHGetSpecialFolderPath(0,path_Document,CSIDL_MYDOCUMENTS,0); 
+	SHFILEINFO sfi_Document;
+	::SHGetFileInfo(path_Document,0, &sfi_Document, sizeof(sfi_Document),SHGFI_ICON);
+	m_ilTreeIcons.Add(sfi_Document.hIcon); //4
+	
+初始化函数：
+
+	m_TreePath.ModifyStyle(0, WS_VISIBLE|TVS_HASBUTTONS|TVS_HASLINES|TVS_LINESATROOT|TVS_SHOWSELALWAYS|TVS_TRACKSELECT);
+	m_TreePath.SetImageList(&m_ilTreeIcons, TVSIL_NORMAL);
+	
+	//插入
+	hRoot = m_TreePath.InsertItem(L"此电脑");
+	//m_TreePath.InsertItem(L"桌面", hRoot);
+	//m_TreePath.InsertItem(L"我的文档",hRoot);
+	m_TreePath.InsertItem(L"桌面", 3, 3, hRoot, TVI_LAST);
+	m_TreePath.InsertItem(L"我的文档", 4, 4, hRoot, TVI_LAST);
 
 ## 圣诞蔷薇 -- 追忆的爱情
