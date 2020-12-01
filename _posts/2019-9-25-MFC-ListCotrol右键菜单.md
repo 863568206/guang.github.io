@@ -289,7 +289,262 @@ xxx.cpp
 	m_List.InsertItem(1,_T("C盘"),1);
 	m_List.InsertItem(2,_T("桌面"),2);
 	m_List.InsertItem(3,_T("我的文档"),3);
+	
+# 虚拟列表设置
+
+ListCotrol列表提供了虚拟列表用来提高列表数据的显示速度。[参考](https://blog.csdn.net/daiafei/article/details/6825034)
+
+## 声明
+  	
+	FILE_LIST_INFO //结构体
+
+	CListCtrl m_list;
+	afx_msg void GetDispInfo(NMHDR* pNMHDR, LRESULT* pResult);   //显示事件
+	afx_msg void OnNMClickListClick(NMHDR* pNMHDR, LRESULT* pResult); //Checked更新
+	CArray<FILE_LIST_INFO, FILE_LIST_INFO> m_arInsertListInfo;   //保存List数据的缓冲区
+	void xxxDlg::SortColumn(int iCol, bool bAsc)； //行号，排序标志，点击表头排序比较函数
 
 
+## 事件
+
+	ON_NOTIFY(LVN_GETDISPINFO, IDC_LIST_xxx, &xxxDlg::GetDispInfo)
+	ON_NOTIFY(NM_CLICK, IDC_LIST_xxx, &xxxDlg::OnNMClickListClick)
+
+## 定义
+
+GetDispInfo：：
+
+	void xxxDlg::GetDispInfo(NMHDR* pNMHDR, LRESULT* pResult) 
+	{
+		LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
+		LV_ITEM* pItem= &(pDispInfo)->item;
+		int itemid = pItem->iItem; //行号
+		FILE_LIST_INFO rListInfo = m_arInsertListInfo.ElementAt(pItem->iItem);
+	
+		if (pItem->mask & LVIF_TEXT)  //内容
+		{
+			switch(pItem->iSubItem)
+			{
+			case 0:
+				{
+					lstrcpy(pItem->pszText, rListInfo.strFileName);
+				}
+				break;
+			case 1:
+				{
+					lstrcpy(pItem->pszText, rListInfo.strFilePath);
+				}			
+				break;
+			case 2:
+				{
+					lstrcpy(pItem->pszText, rListInfo.strFileSize);
+				}
+				break;
+			default:
+				//ASSERT(0);
+				break;
+			}
+		}
+	
+		if (pItem->mask & LVIF_IMAGE)   //显示图片
+		{
+			// then display the appropriate column
+			switch(pItem->iSubItem)
+			{
+			case 0:
+				{
+					int iImageIndex = 0;
+					CString strFilePath = rListInfo.strFileClientPath;
+					int iPos = strFilePath.ReverseFind('.');
+					CString strIcon = strFilePath.Right(strFilePath.GetLength()-iPos-1);
+					iImageIndex = OnAddIcon(strIcon);//获取文件的ico
+					
+					pItem->iImage = iImageIndex;
+				}
+				break;
+			default:
+				//ASSERT(0);
+				break;
+			}
+		}
+	
+		//添加复选框
+		pItem->mask |= LVIF_STATE;
+	
+		pItem->stateMask = LVIS_STATEIMAGEMASK;
+	
+		if(rListInfo.bPitchOnFlag)//判断结构中保存的当前行的选中状态
+		{
+			pItem->state |=   INDEXTOSTATEIMAGEMASK(2);   //取你自己保存的state状态,   需要用到INDEXTOSTATEIMAGEMASK 
+		}
+		else
+		{
+			pItem->state |=   INDEXTOSTATEIMAGEMASK(1);   //未选中
+		}
+	
+		*pResult = 0;
+	}
+
+OnNMClickList：
+
+	void CFileTimeMachineClientDlg::OnNMClickListClick(NMHDR* pNMHDR, LRESULT* pResult)
+	{
+		NMLISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	
+		LVHITTESTINFO hitinfo;
+	
+		hitinfo.pt = pNMListView->ptAction;
+		int item = m_listFileTime.HitTest(&hitinfo);
+	
+		if(item != -1)
+		{
+	
+			//看看鼠标是否单击在 check box上面了?
+			if( (hitinfo.flags & LVHT_ONITEMSTATEICON) != 0)
+			{
+				m_arInsertListInfo[item].bPitchOnFlag = !m_arInsertListInfo[item].bPitchOnFlag;//改变状态
+				m_listFileTime.RedrawItems(item, item); //重绘当前项 		
+			}
+		}
+	
+		*pResult = 0;
+	}
+
+
+写入缓冲区数据：
+
+	FILE_LIST_INFO Info;
+		
+	int iCount = m_arInsertListInfo.GetSize(); 
+	m_arInsertListInfo.SetAtGrow(iCount, (*pInfo));
+
+	//设置显示多少行,UpdateList, 用来更新列表数据
+	::AfxGetApp()->DoWaitCursor(1);
+	int iTotalSize = m_arInsertListInfo.GetSize();
+	m_listFileTime.SetItemCountEx(iTotalSize, LVSICF_NOINVALIDATEALL);
+	m_listFileTime.Invalidate();
+	::AfxGetApp()->DoWaitCursor(0);
+
+添加排序：
+	
+	int __cdecl CmpBackUpFileName(const void *elem1, const void *elem2)
+	{
+		FILE_LIST_INFO p1 = (BACKUP_FILE_INSERT_LIST_INFO*)elem1;
+		FILE_LIST_INFO p2 = (BACKUP_FILE_INSERT_LIST_INFO*)elem2;
+	
+		return (p1->strFileName.CompareNoCase(p2->strFileName));
+	}
+	
+	int __cdecl CmpBackUpFilePath(const void *elem1, const void *elem2)
+	{
+		FILE_LIST_INFO p1 = (BACKUP_FILE_INSERT_LIST_INFO*)elem1;
+		FILE_LIST_INFO p2 = (BACKUP_FILE_INSERT_LIST_INFO*)elem2;
+	
+		return (p1->strFileClientPath.CompareNoCase(p2->strFileClientPath));
+	}
+	
+	int __cdecl CmpBackUpFileSize(const void *elem1, const void *elem2)
+	{
+		FILE_LIST_INFO p1 = (BACKUP_FILE_INSERT_LIST_INFO*)elem1;
+		FILE_LIST_INFO p2 = (BACKUP_FILE_INSERT_LIST_INFO*)elem2;
+		
+		if (p1->iFileSize == p2->iFileSize)
+		{
+			return 0;
+		}
+		else if (p1->iFileSize < p2->iFileSize)
+		{
+			return -1;
+		}
+		else if (p1->iFileSize > p2->iFileSize)
+		{
+			return 1;
+		}
+	
+		return 0;
+		//return (p1->strFileClientPath.CompareNoCase(p2->strFileClientPath));
+	}
+
+	void xxxDlg::SortColumn(int iCol, bool bAsc) //行号，排序标志
+	{
+		switch(iCol)
+		{
+		case 0:
+			{
+				::AfxGetApp()->DoWaitCursor(TRUE);
+				if (bAsc)
+				{
+					qsort( static_cast<void*>(&m_arInsertListInfo[0]), m_arInsertListInfo.GetSize(), sizeof(FILE_LIST_INFO), CmpBackUpFileName);
+				}
+				else
+				{
+					qsort( static_cast<void*>(&m_arInsertListInfo[0]), m_arInsertListInfo.GetSize(), sizeof(FILE_LIST_INFO), CmpBackUpFileName);
+				}			
+				::AfxGetApp()->DoWaitCursor(FALSE);
+			}
+			break;
+		case 1:
+			{
+				::AfxGetApp()->DoWaitCursor(TRUE);
+				if (bAsc)
+				{
+					qsort( static_cast<void*>(&m_arInsertListInfo[0]), m_arInsertListInfo.GetSize(), sizeof(FILE_LIST_INFO), CmpBackUpFilePath);
+				}
+				else
+				{
+					qsort( static_cast<void*>(&m_arInsertListInfo[0]), m_arInsertListInfo.GetSize(), sizeof(FILE_LIST_INFO), CmpBackUpFilePath);
+				}			
+				::AfxGetApp()->DoWaitCursor(FALSE);
+			}
+			break;
+		case 2:
+			{
+				::AfxGetApp()->DoWaitCursor(TRUE);
+				if (bAsc)
+				{
+					qsort( static_cast<void*>(&m_arInsertListInfo[0]), m_arInsertListInfo.GetSize(), sizeof(FILE_LIST_INFO), CmpBackUpFileSize);
+				}
+				else
+				{
+					qsort( static_cast<void*>(&m_arInsertListInfo[0]), m_arInsertListInfo.GetSize(), sizeof(FILE_LIST_INFO), CmpBackUpFileSize);
+				}			
+				::AfxGetApp()->DoWaitCursor(FALSE);
+			}
+			break;
+		default:
+			break;
+		}
+		
+		UpDateListInfo();  //更新List
+	}
+
+	
+
+
+	typedef stdext::hash_map<string,int> MapSysIconInfo;
+
+
+	//弹出菜单设置
+	void CFileTimeMachineCustomizeBackupSettingsDlg::OnNMRClickListCotrol(NMHDR *pNMHDR, LRESULT *pResult)
+	{
+		// TODO: 在此添加控件通知处理程序代码
+		do 
+		{
+			LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+			CMenu menu, *popup;
+
+			menu.LoadMenu(IDR_MENU_FILE_TIME_MACHINE_CUSTOMIZE_BACKUP_SETTINGS);
+			CPoint point;
+
+			GetCursorPos(&point);
+			popup = menu.GetSubMenu(0);
+			CXTPCommandBars::TrackPopupMenu(popup, 0, point.x, point.y, this);
+
+		} while (FALSE);
+
+		*pResult = 0;
+		return;
+	}
+	
 
 ## 蒲公英 -- 无法停留的爱
