@@ -27,6 +27,17 @@ tags:
 	dwStyle |= LVS_OWNERDATA;
 	m_list.SetExtendedStyle(dwStyle); //设置扩展风格
 
+# 获取选中行
+
+	int iItem = 0;
+	for ( iItem = m_list.GetItemCount(); iItem >= 0; iItem--)
+	{
+		if ( LVIS_SELECTED == m_listFTM.GetItemState(iItem, LVIS_SELECTED))     //发现选中行
+		{
+			break;
+		}
+	} 
+
 
 # MFC列表框右键菜单
 
