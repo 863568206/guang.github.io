@@ -62,7 +62,6 @@ kramdown:
 # Gitalk
 gitalk:
   enable: true    #是否开启Gitalk评论
-  id: location.pathname
   clientID: 6c60305e80572778ca20                           #生成的clientID
   clientSecret: e92ad243ba52f2adb0dc91ec7fa8eedd39e9fb1e   #生成的clientSecret
   repo: BlogTalkComment #仓库名称
