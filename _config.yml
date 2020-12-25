@@ -64,7 +64,7 @@ gitalk:
   enable: true    #是否开启Gitalk评论
   clientID: 87d1fb727a47a42c576b                            #生成的clientID
   clientSecret:  395d9d0cc3f1907748b00f73cfe8ecd9443af4ed     #生成的clientSecret
-  repo: GittalkComment.github.io    #仓库名称
+  repo: 863568206/GittalkComment #仓库名称
   owner: 863568206     #github用户名
   admin: YiMiTuMi
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
