@@ -211,6 +211,41 @@ tags:
 
 这种跳转方式占用的空间为14个字节，并不改变任何寄存器。
 
+## 裸函数写法
+
+	void __declspec(naked) NewMessageBox()
+	{
+		_asm
+		{
+			//保存寄存器
+			pushad
+			pushfd
+
+			//调用处理函数
+			PUSH DWORD PTR SS : [esp + 0x28]
+			PUSH DWORD PTR SS : [esp + 0x30]
+			PUSH DWORD PTR SS : [esp + 0x38]
+			PUSH DWORD PTR SS : [esp + 0x40]
+			CALL MessageBoxProc    
+			add esp, 0x10      //平衡堆栈（这个是外平栈）
+
+			//恢复寄存器
+			popfd
+			popad
+
+			//执行覆盖代码
+			MOV EDI, EDI
+			PUSH EBP
+			MOV EBP, ESP
+
+			//执行返回
+			push dwHookAddress
+			add dword ptr ds:[esp], 6
+			retn
+		}
+	}
+
+
 ## 龙胆花 -- 喜欢看忧伤时的你 
 
 
