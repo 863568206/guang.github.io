@@ -198,5 +198,76 @@ CTreeCtrl生成文件树状图。
 	//m_TreePath.InsertItem(L"我的文档",hRoot);
 	m_TreePath.InsertItem(L"桌面", 3, 3, hRoot, TVI_LAST);
 	m_TreePath.InsertItem(L"我的文档", 4, 4, hRoot, TVI_LAST);
+	
+## 展开消息事件
+
+Tree.h
+
+	afx_msg void OnTvnGetdispinfoTree(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTvnItemexpandingTree(NMHDR *pNMHDR, LRESULT *pResult);
+
+消息
+
+	ON_NOTIFY(TVN_GETDISPINFO, IDC_TREE_xxx, &Tree::OnTvnGetdispinfoTree)
+	ON_NOTIFY(TVN_ITEMEXPANDING, IDC_TREE_xxx, &Tree::OnTvnItemexpandingTree)
+
+Tree.cpp
+
+	void Tree::OnTvnGetdispinfoTree(NMHDR *pNMHDR, LRESULT *pResult)
+	{
+		LPNMTVDISPINFO pTVDispInfo = reinterpret_cast<LPNMTVDISPINFO>(pNMHDR);
+		// TODO: 在此添加控件通知处理程序代码
+		pTVDispInfo->item.cChildren = 1;
+		*pResult = 0;
+	}
+	
+	void Tree::OnTvnItemexpandingTree(NMHDR *pNMHDR, LRESULT *pResult)
+	{
+		LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+		// TODO: 在此添加控件通知处理程序代码
+		//树形节点展开时会调用该函数
+		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+
+		//通过判断节点是否有数据判断是否展开过，产开过就返回
+		Tree *pInfo = (Tree*)m_Tree.GetItemData(hItem);
+		if (pInfo == NULL)
+		{
+			*pResult = 0;
+			return;
+		}
+		if (pInfo->bIsExpanded)
+		{
+			*pResult = 0;
+			return;
+		}
+	
+		pInfo->bIsExpanded = TRUE;
+		m_Tree.SetItemData(hItem,DWORD_PTR(pInfo));
+	
+		//根据层级获取信息
+		int iChildrenCount = 0;
+
+		{
+			//再此添加事件代码
+			
+		}
+	
+		//if (iChildrenCount)
+		//{
+		//	TVITEM item;	
+		//	item.hItem = hItem;
+		//	item.mask = TVIF_HANDLE|TVIF_CHILDREN|TVIF_DI_SETITEM;
+		//	//m_tree.GetItem(&item);
+		//	item.mask = TVIF_CHILDREN;
+		//	item.cChildren = 0;
+		//	m_TreePath.SetItem(&item);
+		//}
+	
+		//SetRedraw(TRUE);
+	
+		Invalidate();
+		*pResult = 0;
+	}
+
 
 ## 圣诞蔷薇 -- 追忆的爱情
