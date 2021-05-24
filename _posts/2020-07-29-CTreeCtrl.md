@@ -205,6 +205,16 @@ Tree.h
 
 	afx_msg void OnTvnGetdispinfoTree(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTvnItemexpandingTree(NMHDR *pNMHDR, LRESULT *pResult);
+	
+	class CLASS_TREE_DATA_INFO
+	{
+	public:
+		BOOL bIsExpanded;
+		CLASS_TREE_DATA_INFO()
+		{
+		     bIsExpanded = FALSE;
+		}
+	};
 
 消息
 
@@ -229,7 +239,7 @@ Tree.cpp
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
 
 		//通过判断节点是否有数据判断是否展开过，产开过就返回
-		Tree *pInfo = (Tree*)m_Tree.GetItemData(hItem);
+		CLASS_TREE_DATA_INFO *pInfo = (CLASS_TREE_DATA_INFO*)m_Tree.GetItemData(hItem);
 		if (pInfo == NULL)
 		{
 			*pResult = 0;
