@@ -557,5 +557,57 @@ OnNMClickList：
 		return;
 	}
 	
+## 将列表的文本复制到剪贴板
+
+List本身并不支持剪贴板的复制，所以我们加一个菜单将他复制到剪贴板上：
+
+	void xxx::OnViewlog()  //菜单事件
+	{
+		//获取选中行号
+		POSITION pos = m_list.GetFirstSelectedItemPosition();
+		LVITEM item;
+		ZeroMemory(&item, sizeof(item));
+		item.mask = LVIF_INDENT|LVIF_PARAM;
+		item.iItem = m_list.GetNextSelectedItem(pos);
+	
+		//处理该菜单对应的功能
+		CString strInfo;
+		strInfo = m_pListTemp->GetItemText(item.iItem, 5);   //获取复制内容
+	
+		if (!strInfo.IsEmpty())
+		{
+			if (!OpenClipboard()) //打开剪贴板
+			{
+				CString strMsg = _T("打开剪贴板错误！");
+				return;			
+			}
+			
+			if(!EmptyClipboard()) //清空剪贴板
+			{
+				CString strMsg = _T("清空剪贴板失败！");
+				return;	
+			}		
+	
+			LPTSTR  lptstrCopy; 
+			HGLOBAL  hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (strInfo.GetLength() + 1) * sizeof(TCHAR)); 
+			if (hglbCopy == NULL) 
+			{ 
+				CloseClipboard(); 
+				return;
+			} 
+	
+			// Lock the handle and copy the text to the buffer. 
+	
+			lptstrCopy = (LPTSTR)GlobalLock(hglbCopy); 
+			_tcscpy(lptstrCopy, strInfo) ;
+			GlobalUnlock(hglbCopy); 
+	
+			SetClipboardData(CF_UNICODETEXT, hglbCopy);
+			CloseClipboard(); 
+	
+			CString strMsg = _T("复制内容到剪贴板成功！");
+		}
+	
+	}	
 
 ## 蒲公英 -- 无法停留的爱
