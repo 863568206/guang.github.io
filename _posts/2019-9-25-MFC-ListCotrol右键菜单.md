@@ -396,7 +396,7 @@ GetDispInfo：：
 		*pResult = 0;
 	}
 
-OnNMClickList：
+OnNMClickList（复选框点击事件）：
 
 	void CFileTimeMachineClientDlg::OnNMClickListClick(NMHDR* pNMHDR, LRESULT* pResult)
 	{
@@ -423,11 +423,11 @@ OnNMClickList：
 
 
 写入缓冲区数据：
-
-	FILE_LIST_INFO Info;
-		
+	
+	//这段将数据写入到 m_arInsertListInfo 中
+	FILE_LIST_INFO Info;	
 	int iCount = m_arInsertListInfo.GetSize(); 
-	m_arInsertListInfo.SetAtGrow(iCount, (*pInfo));
+	m_arInsertListInfo.SetAtGrow(iCount, (*pInfo)); //写入数据
 
 	//设置显示多少行,UpdateList, 用来更新列表数据
 	::AfxGetApp()->DoWaitCursor(1);
@@ -435,6 +435,8 @@ OnNMClickList：
 	m_listFileTime.SetItemCountEx(iTotalSize, LVSICF_NOINVALIDATEALL);
 	m_listFileTime.Invalidate();
 	::AfxGetApp()->DoWaitCursor(0);
+
+一般都是将数据全部写入到 m_arInsertListInfo 中后，通过后面的更新List数据代码来更新List。
 
 添加排序：
 	
@@ -557,7 +559,7 @@ OnNMClickList：
 		return;
 	}
 	
-## 将列表的文本复制到剪贴板
+# 将列表的文本复制到剪贴板
 
 List本身并不支持剪贴板的复制，所以我们加一个菜单将他复制到剪贴板上：
 
@@ -607,7 +609,50 @@ List本身并不支持剪贴板的复制，所以我们加一个菜单将他复�
 	
 			CString strMsg = _T("复制内容到剪贴板成功！");
 		}
+	}
 	
-	}	
+# CListControl中点击Checkbox事件
+
+在**ListControl**中，要点击其中的行，或者其中的**Checkbox**时，要触发点击事件。
+
+在xxx.h中添加：
+
+	afx_msg void OnClickList(NMHDR* pNMHDR, LRESULT* pResult);
+	CListCtrl m_list; //关联列表框的控件变量
+
+在xxx.cpp中添加：
+
+当前的**LVN_ITEMCHANGED**产生消息的时间为当某个项已经发生变化时
+
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_xxx_列表框, &xxx::OnClickList)
+
+	void  xxx::OnClickList(NMHDR* pNMHDR, LRESULT* pResult)
+	{
+		DWORD dwPos = GetMessagePos();
+		CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+
+		m_list.ScreenToClient(&point);
+
+		LVHITTESTINFO lvinfo;
+		lvinfo.pt = point;
+		lvinfo.flags = LVHT_ABOVE;
+
+		UINT nFlag;
+		int nItem = m_list.HitTest(point, &nFlag); //获取点击的行号
+
+		//判断是否点击的Checkbox
+		if (nFlag == LVHT_ONITEMSTATEICON)
+		{
+			if (m_lists.GetCheck(nItem) == FALSE) 
+			{
+				//点击未选中的时
+			}
+			else if (m_list.GetCheck(nItem) == TRUE) 
+			{
+				//点击选中的时
+			}
+		}
+	}
+
 
 ## 蒲公英 -- 无法停留的爱
