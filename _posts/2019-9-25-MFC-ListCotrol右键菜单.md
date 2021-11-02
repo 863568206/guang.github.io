@@ -182,6 +182,7 @@ xxx.cpp
 
 ## 获取Icon函数
 	
+	typedef stdext::hash_map<string,int> MapSysIconInfo;
 	MapSysIconInfo m_mapSysIconInfo;
 	CImageList m_ilIcons;
 	
@@ -531,13 +532,8 @@ OnNMClickList（复选框点击事件）：
 		UpDateListInfo();  //更新List
 	}
 
-	
+弹出菜单设置：
 
-
-	typedef stdext::hash_map<string,int> MapSysIconInfo;
-
-
-	//弹出菜单设置
 	void CFileTimeMachineCustomizeBackupSettingsDlg::OnNMRClickListCotrol(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		// TODO: 在此添加控件通知处理程序代码
@@ -558,6 +554,8 @@ OnNMClickList（复选框点击事件）：
 		*pResult = 0;
 		return;
 	}
+	
+菜单的点击事件与上面的相同。
 	
 # 将列表的文本复制到剪贴板
 
