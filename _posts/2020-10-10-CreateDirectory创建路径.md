@@ -50,6 +50,10 @@ tags:
 			CreateDirectoryW((*iterVec).GetString(), NULL);
 		}
 	}
+	
+Ps: 当前函数参数没做处理，必须以“\\”结尾的路径才能创建成功：
 
+	CString strFileBackUpPath = L"C:\\TempPath\\";  //成功
+	CString strFileBackUpPath1 = L"C:\\TempPath";  //失败
 
 ## 蝴蝶花 -- 相信就是幸福 
