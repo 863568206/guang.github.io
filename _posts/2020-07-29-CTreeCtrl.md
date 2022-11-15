@@ -278,6 +278,32 @@ Tree.cpp
 		Invalidate();
 		*pResult = 0;
 	}
+	
+# 建一个树行表用来展示软件分类等
+
+建表语句：
+
+	IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CLIENT_SOFTWARE_INFO_GROUP_TABLE_]') AND type in (N'U'))
+	BEGIN
+	CREATE TABLE [dbo].[CLIENT_SOFTWARE_INFO_GROUP_TABLE_](
+		[index] [int] IDENTITY(1,1) NOT NULL,
+		[GroupName] [nvarchar](64) NULL,/*组名*/
+		[ParentIndex] int NULL,/*父级的index -1*/
+		[Comment] [nvarchar](64) NULL,/*备注信息*/
+	 CONSTRAINT [PK_CLIENT_SOFTWARE_INFO_GROUP_TABLE_] PRIMARY KEY CLUSTERED 
+	(
+		[index] ASC
+	)WITH (PAD_INDEX  = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	INSERT INTO [dbo].[CLIENT_SOFTWARE_INFO_GROUP_TABLE_] ([GroupName], [ParentIndex]) VALUES (N'软件分类', -1)
+	INSERT INTO [dbo].[CLIENT_SOFTWARE_INFO_GROUP_TABLE_] ([GroupName], [ParentIndex]) VALUES (N'办公软件', 1)
+	INSERT INTO [dbo].[CLIENT_SOFTWARE_INFO_GROUP_TABLE_] ([GroupName], [ParentIndex]) VALUES (N'聊条软件', 1)
+	INSERT INTO [dbo].[CLIENT_SOFTWARE_INFO_GROUP_TABLE_] ([GroupName], [ParentIndex]) VALUES (N'媒体工具', 1)
+	INSERT INTO [dbo].[CLIENT_SOFTWARE_INFO_GROUP_TABLE_] ([GroupName], [ParentIndex]) VALUES (N'下载工具', 1)
+	END
+
+根据数据建立树形图：
 
 
 ## 圣诞蔷薇 -- 追忆的爱情
