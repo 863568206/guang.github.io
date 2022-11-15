@@ -304,7 +304,8 @@ Tree.cpp
 	END
 
 根据数据建立树形图：
-class CGroupInfo
+
+	class CGroupInfo
 	{
 	public:
 		int iIndex;//表中索引值
