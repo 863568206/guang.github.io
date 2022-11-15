@@ -304,6 +304,146 @@ Tree.cpp
 	END
 
 根据数据建立树形图：
+class CGroupInfo
+	{
+	public:
+		int iIndex;//表中索引值
+		int iParentIndex;//父组的索引
+		CString strGroupName;//父组名
+		CGroupInfo()
+		{
+			iIndex = 0;
+			iParentIndex = 0;
+		}
+	};
+
+	map<int, HTREEITEM> m_mapTreeGroupItem; //保存index对应的节点句柄
+	map<int, CGroupInfo*> m_mapGroupInfo; //保存数据库数据
+	MyTreeCtrl m_treeCtrl; //树控件
+	
+	BOOL initializationCTree()
+	{
+		//查找数据库
+		while (TRUE)
+		{
+			CGroupInfo *pInfo = new CGroupInfo;
+	
+			/* 将数据保存到map
+			RS_GET_VALUE_RET_FALSE((&pRs), _T("index"), pInfo->iIndex);
+			RS_GET_VALUE_RET_FALSE((&pRs), _T("GroupName"), pInfo->strGroupName);
+			RS_GET_VALUE_RET_FALSE((&pRs), _T("ParentIndex"), pInfo->iParentIndex);
+			*/
+	
+			m_mapGroupInfo.insert(std::make_pair(pInfo->iIndex, pInfo));
+			
+		}
+		
+		//建立树
+		map<int, CGroupInfo*>::iterator iter = m_mapGroupInfo.begin();
+		for (; iter != m_mapGroupInfo.end(); iter++)
+		{
+			CGroupInfo *pInfo = iter->second;
+			FindAndAddParentGroup(*pInfo);
+		}
+	
+		//选中根节点
+		HTREEITEM hItemRoot = m_treeCtrl.GetRootItem();
+		if (hItemRoot != NULL)
+		{
+			
+			m_treeCtrl.SelectItem(hItemRoot);
+	
+			m_treeCtrl.SelectSetFirstVisible(hItemRoot);
+			
+		}
+		m_treeCtrl.Expand(hItemRoot, TVE_EXPAND);
+	
+	
+	}
+	
+	//建树函数
+	
+	//查找组,如果没有,那么就添加
+	HTREEITEM FindAndAddParentGroup(CGroupInfo &Info)
+	{
+		HTREEITEM htree = FindGroup(Info.iIndex);
+		if (htree)
+		{
+			return htree;
+		}
+	
+		//添加
+		if (Info.iParentIndex < 0)
+		{
+			HTREEITEM hTempItem = m_treeCtrl.InsertItem(Info.strGroupName, TVI_ROOT);
+			TRACE("iterm iserted:%p", hTempItem);
+			m_treeCtrl.SetItemData(hTempItem, DWORD_PTR(&Info));
+			htree = hTempItem;
+			m_mapTreeGroupItem.insert(std::make_pair(Info.iIndex, hTempItem));
+	
+			//m_treeCtrl.Expand(TVI_ROOT, TVE_EXPAND );
+		}
+		else
+		{
+			map<int, CGroupInfo*>::iterator iter = m_mapGroupInfo.find(Info.iParentIndex);
+			if (iter != m_mapGroupInfo.end())
+			{
+				//
+				CGroupInfo *pInfo = iter->second;
+				htree = FindGroup(*pInfo);
+				if (htree)
+				{
+					HTREEITEM hTempItem = m_treeCtrl.InsertItem(Info.strGroupName, htree, TVI_SORT);
+					m_mapTreeGroupItem.insert(std::make_pair(Info.iIndex, hTempItem));
+					m_treeCtrl.SetItemData(hTempItem, DWORD_PTR(&Info));
+					//m_treeCtrl.Expand(hTempItem, TVE_EXPAND );
+					htree = hTempItem;
+				}
+				else
+				{
+					htree = FindAndAddParentGroup(*pInfo);
+					if (htree)
+					{
+						HTREEITEM hTempItem = m_treeCtrl.InsertItem(Info.strGroupName, htree, TVI_SORT);
+						m_mapTreeGroupItem.insert(std::make_pair(Info.iIndex, hTempItem));
+						m_treeCtrl.SetItemData(hTempItem, DWORD_PTR(&Info));
+						//m_treeCtrl.Expand(htree, TVE_EXPAND );
+						htree = hTempItem;
+					}
+				}
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+	
+		return htree;
+	}
+	
+	
+	HTREEITEM FindGroup(int iGroupIndex)
+	{
+		map<int, CGroupInfo*>::iterator iter = m_mapTreeGroupItem.find(iGroupIndex);
+		if (iter != m_mapTreeGroupItem.end())
+		{
+			return iter->second;
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+先设定根节点，数据库查表时根据index从小到大排序，新插入的节点index肯定比父节点的index大，所以从头遍历表进行插入。CGroupInfo new出来的记得释放：
+
+	map<int, CGroupInfo*>::iterator iter = m_mapGroupInfo.begin();
+		for (; iter != m_mapGroupInfo.end(); iter++)
+		{
+			CEncryptGroupLevelInfo *pInfo = iter->second;
+			delete pInfo;
+			pInfo = NULL;
+		}
 
 
 ## 圣诞蔷薇 -- 追忆的爱情
